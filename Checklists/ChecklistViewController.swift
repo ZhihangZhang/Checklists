@@ -56,7 +56,7 @@ class ChecklistViewController: UITableViewController {
     }
     
     // MARK: Delegate functions
-    // data source functions
+    // MARK: Data source functions
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
     }
@@ -80,7 +80,15 @@ class ChecklistViewController: UITableViewController {
         return cell
     }
     
-    // delegate functions
+    // get called when the red delete button is tapped
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        items.remove(at: indexPath.row)
+        
+        let indexPaths = [indexPath]
+        tableView.deleteRows(at: indexPaths, with: .automatic)
+    }
+    
+    // MARK: Delegate functions
     // gets called when the row is selected
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // toggle the checkmark in the cell
@@ -96,6 +104,9 @@ class ChecklistViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+
+    
+    // MARK: helper functions
     // function configuring the accessory type of a cell
     func configureCheckmark(for cell: UITableViewCell, with item: ChecklistItem){
         if item.checked {
@@ -110,5 +121,25 @@ class ChecklistViewController: UITableViewController {
         let label = cell.viewWithTag(1000) as! UILabel
         label.text = item.text
     }
+    
+    
+    //MARK: Actions
+    @IBAction func addItem(){
+        let newRowIndex = items.count
+        
+        let newItem = ChecklistItem()
+        newItem.text = "i am a new item!"
+        newItem.checked = false
+        
+        // update data model
+        items.append(newItem)
+        // update view
+        let indexPath = IndexPath(row: newRowIndex, section: 0)
+        let indexPaths = [indexPath]
+        tableView.insertRows(at: indexPaths, with: .automatic)
+    }
+    
+    
+    
 }
 
