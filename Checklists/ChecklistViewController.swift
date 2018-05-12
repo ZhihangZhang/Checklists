@@ -8,7 +8,26 @@
 
 import UIKit
 
-class ChecklistViewController: UITableViewController {
+class ChecklistViewController: UITableViewController, AddItemTableViewControllerDelegate {
+    // MARK: Delegate methods for add item screen
+    func addItemTableViewControllerDidCancel(_ controller: AddItemTableViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func addItemTableViewController(_ controller: AddItemTableViewController, didFinishAdding item: ChecklistItem) {
+        addItem(item)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    
+    // prepare gets gets called when the segue is about to happen, allowing information to be transferred to the controller before it gets displayed
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "AddItem"{
+            let controller = segue.destination as! AddItemTableViewController  // casting UIViewController to AddItemTableViewController, which may gives a nil value
+            controller.delegate = self
+        }
+    }
+    
     // MARK: Properties
     var items: [ChecklistItem]
 
@@ -89,7 +108,7 @@ class ChecklistViewController: UITableViewController {
     }
     
     // MARK: Delegate functions
-    // gets called when the row is selected
+    // gets called when the row is tapped
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // toggle the checkmark in the cell
         if let cell = tableView.cellForRow(at: indexPath) {
@@ -123,16 +142,12 @@ class ChecklistViewController: UITableViewController {
     }
     
     
-    //MARK: Actions
-    @IBAction func addItem(){
+    //MARK: Functions
+    func addItem(_ item: ChecklistItem){
         let newRowIndex = items.count
-        
-        let newItem = ChecklistItem()
-        newItem.text = "i am a new item!"
-        newItem.checked = false
-        
         // update data model
-        items.append(newItem)
+        items.append(item)
+        
         // update view
         let indexPath = IndexPath(row: newRowIndex, section: 0)
         let indexPaths = [indexPath]

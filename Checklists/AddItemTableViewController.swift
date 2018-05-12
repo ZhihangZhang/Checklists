@@ -8,11 +8,18 @@
 
 import UIKit
 
+// by specifying class at the end of the protocol signature, only class can adopt this protocol
+protocol AddItemTableViewControllerDelegate: class {
+    func addItemTableViewControllerDidCancel(_ controller: AddItemTableViewController)
+    func addItemTableViewController(_ controller: AddItemTableViewController, didFinishAdding item: ChecklistItem)
+}
+
+
 class AddItemTableViewController: UITableViewController, UITextFieldDelegate{
     //MARK: Properties
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
-    
+    weak var delegate: AddItemTableViewControllerDelegate?
     
     
     override func viewDidLoad() {
@@ -30,7 +37,8 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate{
         return nil
     }
     
-    //MARK: textField Delegates (it is a PROTOCOL! so there is not method we can override)
+    //MARK: textField Delegates
+    // (it is a PROTOCOL!)
     // gets called each time user change the text
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let oldText = textField.text!
@@ -44,13 +52,17 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate{
     
     
     //MARK: Actions
+    // sending messages to its delegate (by executing its methods)
     @IBAction func cancel(){
-        navigationController?.popViewController(animated: true)
+        delegate?.addItemTableViewControllerDidCancel(self)
     }
 
     @IBAction func done(){
-        print("Contents of the text field: \(textField.text!)")
-        navigationController?.popViewController(animated: true)
+        let item = ChecklistItem()
+        item.text = textField.text!
+        item.checked = false
+        
+        delegate?.addItemTableViewController(self, didFinishAdding: item)
     }
 
 }

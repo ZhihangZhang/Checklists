@@ -44,7 +44,7 @@
                     <navigationItem key="navigationItem" title="Checklists" id="cjd-d2-b8T">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="b9X-02-EA0">
                             <connections>
-                                <segue destination="Npr-Pi-LTF" kind="show" id="K8G-pP-cx7"/>
+                                <segue destination="Npr-Pi-LTF" kind="show" identifier="AddItem" id="K8G-pP-cx7"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
