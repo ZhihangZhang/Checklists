@@ -8,14 +8,24 @@
 
 import UIKit
 
-class ChecklistViewController: UITableViewController, AddItemTableViewControllerDelegate {
+class ChecklistViewController: UITableViewController, ItemDetailViewControllerDelegate {
     // MARK: Delegate methods for add item screen
-    func addItemTableViewControllerDidCancel(_ controller: AddItemTableViewController) {
+    func itemDetailViewControllerDidCancel(_ controller: ItemDetailViewController) {
         navigationController?.popViewController(animated: true)
     }
     
-    func addItemTableViewController(_ controller: AddItemTableViewController, didFinishAdding item: ChecklistItem) {
+    func itemDetailViewController(_ controller: ItemDetailViewController, didFinishAdding item: ChecklistItem) {
         addItem(item)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func itemDetailViewController(_ controller: ItemDetailViewController, didFinishEditing item: ChecklistItem) {
+        if let index = items.index(of: item){
+            let indexPath = IndexPath(row: index, section: 0)
+            if let cell = tableView.cellForRow(at: indexPath){
+                configureText(for: cell, with: item)
+            }
+        }
         navigationController?.popViewController(animated: true)
     }
     
@@ -23,8 +33,15 @@ class ChecklistViewController: UITableViewController, AddItemTableViewController
     // prepare gets gets called when the segue is about to happen, allowing information to be transferred to the controller before it gets displayed
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "AddItem"{
-            let controller = segue.destination as! AddItemTableViewController  // casting UIViewController to AddItemTableViewController, which may gives a nil value
+            let controller = segue.destination as! ItemDetailViewController  // casting UIViewController to itemDetailViewController, which may gives a nil value
             controller.delegate = self
+        } else if segue.identifier == "EditItem"{
+            let controller = segue.destination as! ItemDetailViewController  // casting UIViewController to itemDetailViewController, which may gives a nil value
+            controller.delegate = self
+            
+            if let indexPath = tableView.indexPath(for: sender as! UITableViewCell) {
+                controller.itemToEdit = items[indexPath.row]
+            }
         }
     }
     
@@ -128,10 +145,11 @@ class ChecklistViewController: UITableViewController, AddItemTableViewController
     // MARK: helper functions
     // function configuring the accessory type of a cell
     func configureCheckmark(for cell: UITableViewCell, with item: ChecklistItem){
+        let chevron = cell.viewWithTag(1001) as! UILabel
         if item.checked {
-            cell.accessoryType = .checkmark
+            chevron.text = "✔︎"
         }else{
-            cell.accessoryType = .none
+            chevron.text = ""
         }
     }
     
@@ -155,6 +173,7 @@ class ChecklistViewController: UITableViewController, AddItemTableViewController
     }
     
     
+
     
 }
 

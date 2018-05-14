@@ -1,5 +1,5 @@
 //
-//  AddItemTableViewController.swift
+//  itemDetailViewController.swift
 //  Checklists
 //
 //  Created by Zhihang Zhang on 2018-05-09.
@@ -9,22 +9,30 @@
 import UIKit
 
 // by specifying class at the end of the protocol signature, only class can adopt this protocol
-protocol AddItemTableViewControllerDelegate: class {
-    func addItemTableViewControllerDidCancel(_ controller: AddItemTableViewController)
-    func addItemTableViewController(_ controller: AddItemTableViewController, didFinishAdding item: ChecklistItem)
+protocol ItemDetailViewControllerDelegate: class {
+    func itemDetailViewControllerDidCancel(_ controller: ItemDetailViewController)
+    func itemDetailViewController(_ controller: ItemDetailViewController, didFinishAdding item: ChecklistItem)
+    func itemDetailViewController(_ controller: ItemDetailViewController, didFinishEditing item: ChecklistItem)
+    
 }
 
 
-class AddItemTableViewController: UITableViewController, UITextFieldDelegate{
+class ItemDetailViewController: UITableViewController, UITextFieldDelegate{
     //MARK: Properties
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
-    weak var delegate: AddItemTableViewControllerDelegate?
+    weak var delegate: ItemDetailViewControllerDelegate?
+    var itemToEdit: ChecklistItem?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        navigationItem.largeTitleDisplayMode = .never
+    
+        if let item = itemToEdit {
+            title = "Edit Item"
+            textField.text = item.text
+            doneBarButton.isEnabled = true
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -54,15 +62,24 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate{
     //MARK: Actions
     // sending messages to its delegate (by executing its methods)
     @IBAction func cancel(){
-        delegate?.addItemTableViewControllerDidCancel(self)
+        delegate?.itemDetailViewControllerDidCancel(self)
     }
 
     @IBAction func done(){
-        let item = ChecklistItem()
-        item.text = textField.text!
-        item.checked = false
-        
-        delegate?.addItemTableViewController(self, didFinishAdding: item)
+        if let itemToEdit = itemToEdit {
+            // editing mode
+            itemToEdit.text = textField.text!
+            delegate?.itemDetailViewController(self, didFinishEditing: itemToEdit)
+            
+        } else {
+            // adding mode
+            let item = ChecklistItem()
+            item.text = textField.text!
+            item.checked = false
+            
+            delegate?.itemDetailViewController(self, didFinishAdding: item)
+        }
+
     }
 
 }
